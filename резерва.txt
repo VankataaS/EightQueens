@@ -1,0 +1,98 @@
+#define N 8
+#include <stdbool.h>
+#include <stdio.h>
+
+/*Функцията за принтване на решението*/
+void printSolution(int board[N][N])
+{
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++)
+			printf(" %d ", board[i][j]);
+		printf("\n");
+	}
+}
+
+/* Помощна функция за проверка дали една кралица може
+да бъде поставен на борда[ред][колона]. Проверяваме само от лявата страна защото вече са поставенил. Като вървим от дясно наляво*/
+bool isSafe(int board[N][N], int row, int col)
+{
+	int i, j;
+
+	/* Проверка ред от лявата страна */
+	for (i = 0; i < col; i++)
+		if (board[row][i])
+			return false;
+
+	/* Проверка горния диагонал от лявата страна */
+	for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+		if (board[i][j])
+			return false;
+
+	/* Проверка долния диагонал от лявата страна */
+	for (i = row, j = col; j >= 0 && i < N; i++, j--)
+		if (board[i][j])
+			return false;
+
+	return true;
+}
+
+/* Рекурсивна  функция*/
+bool solveNQUtil(int board[N][N], int col)
+{
+	/* основен случай: Ако всички дами са поставени
+след това върнете true */
+	if (col >= N)
+		return true;
+
+	/* Проверяваме за колона и опитваме да поставим
+тази кралица във всички редове един по един */
+	for (int i = 0; i < N; i++) {
+		/* Проверка дали кралицата може да бъде поставена */
+		if (isSafe(board, i, col)) {
+			/* Поставяме кралицата в свободният ред и колона[i][col] */
+			board[i][col] = 1;
+
+		
+			if (solveNQUtil(board, col + 1))
+				return true;
+
+			/* Ако не е свободно за поставяне */
+			board[i][col] = 0; // BACKTRACK
+		}
+	}
+
+	/* връщаме false ако няма свободно място за кралицата в колоната */
+	return false;
+}
+
+/* Тази функция Връща false, ако дами
+не могат да бъдат поставени, в противен случай връща true и
+отпечатва поставяне на дами под формата на 1.*/
+bool solveNQ()
+{
+	int board[N][N] = { { 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 },
+	                    { 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0 }, };
+
+	if (solveNQUtil(board, 0) == false) {
+		printf("Solution does not exist");
+		return false;
+	}
+
+	printSolution(board);
+	return true;
+}
+
+
+int main()
+{
+	solveNQ();
+	return 0;
+}
+
+
